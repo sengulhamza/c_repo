@@ -14,11 +14,17 @@ jobs:
         fi
         git clone git@github.com:sengulhamza/c_repo.git
 
-    - name: Code Style Check
+    - name: Code Style Check:auth_with_cmac
       run : |
         cd c_repo/auth_with_cmac
         ./code-format.sh && git diff --exit-code
-  build:
+
+    - name: Code Style Check:frame_oop_with_crc
+      run : |
+        cd c_repo/frame_oop_with_crc
+        ./code-format.sh && git diff --exit-code
+
+  build_debug:
     needs: style-check
     runs-on: self-hosted
     steps:
@@ -27,7 +33,7 @@ jobs:
         gcc --version
         cmake --version
 
-    - name: Build Debug
+    - name: Build:auth_with_cmac
       run: |
         cd c_repo/auth_with_cmac
         mkdir build
@@ -35,11 +41,29 @@ jobs:
         cmake ..
         make
 
-    - name: Run
+    - name: Build:frame_oop_with_crc
       run: |
-        cd c_repo/frame_oop_with_crc/build
+        cd c_repo/frame_oop_with_crc
+        make
+
+  run_debug:
+    needs: build_debug
+    runs-on: self-hosted
+    steps:
+    - name: Run:auth_with_cmac
+      run: |
+        cd c_repo/auth_with_cmac/build
         ./auth_with_cmac
 
+    - name: Run:frame_oop_with_crc
+      run: |
+        cd c_repo/frame_oop_with_crc
+        ./frame_oop_with_crc
+
+  clear_cache:
+    needs: run_debug
+    runs-on: self-hosted
+    steps:
     - name: Clear cache and disk
       run : |
         sudo rm -r c_repo
