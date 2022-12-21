@@ -1,0 +1,32 @@
+name: Code Style Check & Build
+
+on: push
+
+jobs:
+  style-check:
+    runs-on: self-hosted
+    steps:
+    - name: Checkout code
+      run: |
+        git clone git@github.com:sengulhamza/c_repo.git
+
+    - name: Code Style Check
+      run : |
+        cd c_repo/frame_oop_with_crc
+        ./code-format.sh && git diff --exit-code
+  build:
+    needs: style-check
+    runs-on: self-hosted
+    steps:
+    - name: Check gcc version
+      run: |
+        gcc --version
+
+    - name: Build Debug
+      run: |
+        cd c_repo/frame_oop_with_crc
+        make
+
+    - name: Clear cache and disk
+      run : |
+        sudo rm -r c_repo
