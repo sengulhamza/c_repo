@@ -8,6 +8,10 @@ jobs:
     steps:
     - name: Checkout code
       run: |
+        if [ -d "c_repo" ]; then
+          echo "If the directory exists, delete it"
+          rm -rf "c_repo"
+        fi
         git clone git@github.com:sengulhamza/c_repo.git
 
     - name: Code Style Check

@@ -1,1 +1,1 @@
-./tools/format.sh --recursive "*.c" "*.h" "*.cpp" "*.hpp"
+./tools/format.sh --recursive "*.c" "*.h"
