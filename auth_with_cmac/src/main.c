@@ -16,6 +16,8 @@ int main()
     /* Message to be encrypted */
     unsigned char *plaintext = (unsigned char *)"The quick brown fox jumps over the lazy dog";
 
+    /* Show the plain text */
+    hex_dump(VARIABLE_PTR_STRGFY((uint8_t *) plaintext), strlen((char *)plaintext));
     /*
      * Buffer for ciphertext. Ensure the buffer is long enough for the
      * ciphertext which may be longer than the plaintext, depending on the
@@ -33,9 +35,6 @@ int main()
     hex_dump(VARIABLE_PTR_STRGFY((uint8_t *) ciphertext), ciphertext_len);
     /* Decrypt the ciphertext */
     int decryptedtext_len = auth_cmac_decrypt(ciphertext, ciphertext_len, key, iv, decryptedtext);
-
-    /* Add a NULL terminator. We are expecting printable text */
-    decryptedtext[decryptedtext_len] = '\0';
 
     /* Show the decrypted text */
     hex_dump(VARIABLE_PTR_STRGFY((uint8_t *) decryptedtext), decryptedtext_len);
