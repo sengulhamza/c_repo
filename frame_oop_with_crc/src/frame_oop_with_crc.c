@@ -1,62 +1,13 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+#include "frame_oop_with_crc.h"
 
 #define DEBUG 1               //Debug mode define
 
 #if DEBUG
-#define VARIABLE_PTR_STRGFY(var) var, #var
-static void hex_dump(uint8_t *buffer, char *var_name, size_t len)
-{
-    printf("\r\n%s\r\n", var_name);
-    printf("HEX\t\t\t\t\t\t   ASCII\n");
-    printf("---\t\t\t\t\t\t   -----\n");
-    for (int i = 0; i < len; i++) {
-        printf("%02x ", buffer[i]);
-        if ((i + 1) % 8 == 0) {
-            printf(" ");
-        } \
-        if ((i + 1) % 16 == 0) {
-            printf(" ");
-            for (int j = i - 15; j <= i; j++) {
-                printf("%c", buffer[j]);
-            }
-            printf("\n");
-        }
-    }
-    if (len % 16 != 0) {
-        int remaining = len % 16;
-        for (int i = 0; i < 16 - remaining; i++) {
-            printf("   ");
-            if ((i + 1 + len - remaining) % 8 == 0) {
-                printf(" ");
-            }
-        }
-        printf("  ");
-        for (int i = len - remaining; i < len; i++) {
-            printf("%c", buffer[i]);
-        } \
-        printf("\n");
-    }
-}
+#include "hex_dump.h"
 #endif
-
-#define LOOPBACK              //Loopback test define
-
-#define FRAME_OOP_TEST_MSG    "https://meplis.dev"
-#define FRAME_OOP_TEST_ID     (0xC2)
-#define FRAME_OOP_PAYLOAD_LEN (256) //If needs increase, check crc algorithm
-
-/**
- * Struct for storing command frame data
- */
-typedef struct {
-    uint8_t id;
-    uint8_t length;
-    uint8_t payload[FRAME_OOP_PAYLOAD_LEN];
-    uint16_t crc;
-} command_frame_t;
-
 /**
  * Calculate the CRC of the payload
  * @param[in] payload
@@ -88,7 +39,7 @@ static uint16_t frame_oop_calculate_crc(uint8_t *payload, uint8_t length)
  * @param[in] length
  * @param[out] returns frame length
  */
-static uint16_t frame_oop_prepare_frame(command_frame_t *frame, uint8_t id, uint8_t *payload, uint8_t length)
+uint16_t frame_oop_prepare_frame(command_frame_t *frame, uint8_t id, uint8_t *payload, uint8_t length)
 {
     uint8_t *frame_payload_p = frame->payload;
     frame->length = length;
@@ -126,7 +77,7 @@ static uint8_t frame_oop_parse_command_frame(command_frame_t *frame)
  * @param[in] command_frame_t *frame
  * @param[out] if defined LOOPBACK, frame goes to parser (loopback) and return parser's return value.
  */
-static uint8_t send_command_frame(command_frame_t *frame)
+uint8_t send_command_frame(command_frame_t *frame)
 {
     // Calculate the CRC of the payload
     frame->crc = frame_oop_calculate_crc(frame->payload, frame->length);
@@ -138,20 +89,3 @@ static uint8_t send_command_frame(command_frame_t *frame)
     return 1;
 }
 
-int main()
-{
-    // Create a command frame
-    command_frame_t test_frame = {0};
-
-    // Prepare frame
-    frame_oop_prepare_frame(&test_frame, FRAME_OOP_TEST_ID, (uint8_t *)FRAME_OOP_TEST_MSG, sizeof(FRAME_OOP_TEST_MSG));
-
-    // Send the command frame
-    uint8_t result = send_command_frame(&test_frame);
-    if (result) {
-        printf("Command frame sent successfully\n");
-    } else {
-        printf("Error sending command frame\n");
-    }
-    return 0;
-}
