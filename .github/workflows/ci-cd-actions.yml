@@ -44,6 +44,9 @@ jobs:
     - name: Build:frame_oop_with_crc
       run: |
         cd c_repo/frame_oop_with_crc
+        mkdir build
+        cd build
+        cmake ..
         make
 
   run_debug:
@@ -57,7 +60,7 @@ jobs:
 
     - name: Run:frame_oop_with_crc
       run: |
-        cd c_repo/frame_oop_with_crc
+        cd c_repo/frame_oop_with_crc/build
         ./frame_oop_with_crc
 
   clear_cache:
