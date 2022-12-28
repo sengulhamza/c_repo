@@ -49,6 +49,14 @@ jobs:
         cmake ..
         make
 
+    - name: Build:binary_tree
+      run: |
+        cd c_repo/binary_tree
+        mkdir build
+        cd build
+        cmake ..
+        make
+
   run_debug:
     needs: build_debug
     runs-on: self-hosted
@@ -63,6 +71,11 @@ jobs:
         cd c_repo/frame_oop_with_crc/build
         ./frame_oop_with_crc
 
+    - name: Run:binary_tree
+      run: |
+        cd c_repo/binary_tree/build
+        ./binary_tree
+  
   clear_cache:
     needs: run_debug
     runs-on: self-hosted
