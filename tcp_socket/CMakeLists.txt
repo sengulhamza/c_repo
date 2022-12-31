@@ -15,9 +15,11 @@ set(sources
 # add the sources here
 set(sources_client
     src/tcp_sock_client.c
+    src/hex_dump.c
 )
 
-add_executable(tcp_listener ${sources})
-add_executable(tcp_listener_client ${sources_client})
+add_executable(tcp_server ${sources})
+add_executable(tcp_client ${sources_client})
 
-target_include_directories(tcp_listener PRIVATE inc/)
+target_include_directories(tcp_server PRIVATE inc/)
+target_include_directories(tcp_client PRIVATE inc/)

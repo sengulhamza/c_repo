@@ -9,46 +9,53 @@
 #include <sys/types.h>
 #include <arpa/inet.h>
 #include <pthread.h>
+#include "hex_dump.h"
+#include "tcp_msg.h"
 
 #define TCP_SOCK_SERVER_PORT 1234
 #define TCP_SOCK_SERVER_BUFFER_SIZE 1024
 
+#define TCP_SOCK_SERVER_TEST_PAYLOAD "Follow the red rabbit."
+
 static void *tcp_sock_thread_send(void *cfd)
 {
-    char tmp[516] = {"A"};
     int c = *((int *)cfd);
     while (1) {
-        send(c, tmp, 516, 0);
-        printf("send ok\n");
+        send(c, &(tcp_msg_t) {
+            0x1, TCP_SOCK_SERVER_TEST_PAYLOAD, strlen(TCP_SOCK_SERVER_TEST_PAYLOAD)
+        }, sizeof(tcp_msg_t), 0);
+        printf("Message sent.\r\n");
         sleep(2);
     }
 }
 
 static void *tcp_sock_thread_recv(void *cfd)
 {
-    char tmp[516];
+    tcp_msg_t tcp_msg_rec = {0};
     int d = *((int *)cfd);
     while (1) {
         int idata = 0;
-        idata = recv(d, tmp, 516, 0);
+        idata = recv(d, &tcp_msg_rec, sizeof(tcp_msg_t), 0);
         if (idata > 0) {
-            printf("%s \r\n", tmp);
+            printf("\r\nMessage received:\r\n");
+            hex_dump(VARIABLE_PTR_STRGFY((uint8_t *)&tcp_msg_rec), sizeof(tcp_msg_rec));
         }
     }
 }
 
 int main()
 {
-    struct sockaddr_in serv, cli;
     int sfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sfd == -1) {
         perror("socket");
         return -1;
     }
-    //初始化结构体serv
-    serv.sin_family = AF_INET;
-    serv.sin_port = htons(TCP_SOCK_SERVER_PORT);
-    serv.sin_addr.s_addr = htonl(INADDR_ANY);
+
+    struct sockaddr_in serv = {
+        .sin_family = AF_INET,
+        .sin_port = htons(TCP_SOCK_SERVER_PORT),
+        .sin_addr.s_addr = htonl(INADDR_ANY),
+    };
     int bd = bind(sfd, (struct sockaddr *)&serv, sizeof(serv));
     if (bd == -1) {
         perror("bind");
@@ -59,10 +66,9 @@ int main()
         perror("listen");
         return -1;
     }
-    socklen_t cli_len;
-    cli_len = sizeof(cli);
+    socklen_t sock_len = sizeof(struct sockaddr_in);
     while (1) {
-        int cfd = accept(sfd, (struct sockaddr *)&cli, &cli_len);
+        int cfd = accept(sfd, (struct sockaddr *) & (struct sockaddr_in) {}, &sock_len);
         if (cfd == -1) {
             perror("accept");
             return -1;
