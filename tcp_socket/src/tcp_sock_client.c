@@ -15,7 +15,7 @@
 #define TCP_SOCK_CLIENT_ADDR "127.0.0.1"
 #define TCP_SOCK_CLIENT_PORT 1234
 
-#define TCP_SOCK_CLIENT_TEST_PAYLOAD "I am following the red rabbit."
+#define TCP_SOCK_CLIENT_TEST_PAYLOAD "I am following the white rabbit."
 
 static void *tcp_sock_thread_send(void *cfd)
 {

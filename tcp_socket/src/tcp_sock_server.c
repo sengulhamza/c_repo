@@ -15,7 +15,7 @@
 #define TCP_SOCK_SERVER_PORT 1234
 #define TCP_SOCK_SERVER_BUFFER_SIZE 1024
 
-#define TCP_SOCK_SERVER_TEST_PAYLOAD "Follow the red rabbit."
+#define TCP_SOCK_SERVER_TEST_PAYLOAD "Follow the white rabbit."
 
 static void *tcp_sock_thread_send(void *cfd)
 {
